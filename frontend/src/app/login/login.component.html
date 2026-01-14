@@ -1,0 +1,34 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="brand">
+      <span class="material-icons logo-icon">inventory_2</span>
+      <h2>WMS Industrial</h2>
+    </div>
+    
+    <p class="subtitle">Acesso Restrito</p>
+    
+    <div class="form-group">
+      <label>Matrícula</label>
+      <div class="input-wrapper">
+        <span class="material-icons prefix">person</span>
+        <input type="text" [(ngModel)]="matricula" placeholder="Ex: admin">
+      </div>
+    </div>
+  
+    <div class="form-group">
+      <label>Senha</label>
+      <div class="input-wrapper">
+        <span class="material-icons prefix">lock</span>
+        <input [type]="mostrarSenha ? 'text' : 'password'" [(ngModel)]="senha" placeholder="Sua senha" (keyup.enter)="login()">
+        
+        <span class="material-icons suffix clickable" (click)="mostrarSenha = !mostrarSenha">
+          {{ mostrarSenha ? 'visibility' : 'visibility_off' }}
+        </span>
+      </div>
+    </div>
+    
+    <button class="btn-primary" (click)="login()">
+      Entrar no Sistema <span class="material-icons">arrow_forward</span>
+    </button>
+  </div>
+</div>

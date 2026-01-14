@@ -1,0 +1,11 @@
+uvicorn==0.32.1
+fastapi
+sqlalchemy
+pydantic
+pandas
+openpyxl
+passlib[bcrypt]
+bcrypt==4.0.1
+python-multipart
+qrcode[pil]
+pillow

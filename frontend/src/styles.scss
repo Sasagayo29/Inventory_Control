@@ -1,0 +1,153 @@
+/* --- VARIAVEIS DA MARCA (Kinross Palette) --- */
+:root {
+  --primary-color: #C69214; /* Dourado Kinross */
+  --primary-dark: #9e730d;
+  --secondary-color: #222222; /* Cinza Escuro */
+  --bg-color: #F4F6F8; /* Cinza Gelo para fundo */
+  --text-color: #333333;
+  --white: #ffffff;
+  --shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+/* --- RESET & FONTE --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- COMPONENTES GLOBAIS --- */
+
+/* Botões Estilizados */
+button {
+  cursor: pointer;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+  border: 1px solid var(--secondary-color);
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: #000;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  /* Botão Primário (Dourado) */
+  &.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+
+    &:hover {
+      background-color: var(--primary-dark);
+    }
+  }
+
+  /* Botão Perigo (Excluir/Cancelar) */
+  &.btn-danger {
+    background-color: white;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    
+    &:hover {
+      background-color: #dc3545;
+      color: white;
+    }
+  }
+}
+
+/* Inputs Modernos */
+input, select {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 8px 0 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background: #fff;
+  transition: border 0.3s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(192, 137, 7, 0.2);
+  }
+}
+
+/* Tabelas Corporativas */
+table {
+  width: 100%;
+  border-collapse: separate; 
+  border-spacing: 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-top: 10px;
+
+  thead {
+    background-color: var(--secondary-color);
+    color: rgb(107, 75, 0);
+    
+    th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+
+    &:hover {
+      background-color: #fffbf2; /* Leve tom dourado no hover */
+    }
+
+    td {
+      padding: 15px;
+      color: #555;
+    }
+  }
+}
+
+/* Cards (Cartões de Conteúdo) */
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  border-top: 3px solid var(--primary-color); /* Detalhe Kinross */
+}
+
+h1, h2, h3 {
+  font-weight: 300;
+  color: var(--secondary-color);
+}
+
+/* Adicione ao final do src/styles.scss */
+.btn-success {
+  background-color: #28a745; /* Verde Excel */
+  color: white;
+  border-color: #28a745;
+  &:hover { background-color: #218838; }
+}

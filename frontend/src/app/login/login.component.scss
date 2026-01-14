@@ -1,0 +1,83 @@
+$primary: #C69214;
+$bg: #f4f7f6;
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $bg;
+  padding: 20px;
+}
+
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+
+  .brand {
+    margin-bottom: 10px;
+    .logo-icon { font-size: 48px; color: $primary; }
+    h2 { margin: 10px 0 0; color: #333; font-weight: 700; }
+  }
+
+  .subtitle { color: #777; margin-bottom: 30px; font-size: 0.9rem; }
+}
+
+.form-group {
+  text-align: left;
+  margin-bottom: 20px;
+  
+  label { display: block; margin-bottom: 8px; color: #555; font-weight: 500; font-size: 0.9rem; }
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  
+  input {
+    width: 100%;
+    padding: 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    outline: none;
+    transition: border 0.3s;
+    font-size: 1rem;
+    
+    &:focus { border-color: $primary; }
+  }
+
+  .prefix {
+    position: absolute; left: 12px; color: #999;
+  }
+  
+  .suffix {
+    position: absolute; right: 12px; color: #999;
+    &.clickable { cursor: pointer; &:hover { color: $primary; } }
+  }
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: $primary;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s;
+  
+  /* CORREÇÃO AQUI: Substituído darken() por cor fixa */
+  &:hover { background: #a67b11; } 
+}

@@ -1,0 +1,221 @@
+<div class="admin-container">
+  <header>
+    <h1>WMS Industrial</h1>
+    <div class="header-actions">
+      <input type="file" #excelInput (change)="onExcelSelected($event)" style="display:none" accept=".xlsx,.xls">
+      <button class="btn-primary desktop-only" (click)="excelInput.click()" style="background:#217346; border-color:#217346;"><span class="material-icons">upload_file</span> Importar</button>
+      <button class="btn-primary desktop-only" (click)="baixarEstoqueExcel()" style="background:#1976d2; border-color:#1976d2;"><span class="material-icons">download</span> Baixar Estoque</button>
+      <button class="btn-primary" (click)="carregarTudo()"><span class="material-icons">refresh</span> Atualizar</button>
+      <button class="btn-success" (click)="baixarExcel()"><span class="material-icons">file_download</span> Histórico</button>
+    </div>
+  </header>
+
+  <div class="tabs-container">
+    <div class="tabs">
+      <button [class.active]="abaAtiva === 'dashboard'" (click)="trocarAba('dashboard')"><span class="material-icons">analytics</span> Dashboard</button>
+      <button [class.active]="abaAtiva === 'itens'" (click)="trocarAba('itens')"><span class="material-icons">inventory_2</span> Estoque</button>
+      <button [class.active]="abaAtiva === 'etiquetas'" (click)="trocarAba('etiquetas')"><span class="material-icons">qr_code</span> Etiquetas</button>
+      <button [class.active]="abaAtiva === 'usuarios'" (click)="trocarAba('usuarios')"><span class="material-icons">group</span> Acesso</button>
+      <button [class.active]="abaAtiva === 'historico'" (click)="trocarAba('historico')"><span class="material-icons">history</span> Auditoria</button>
+      <button [class.active]="abaAtiva === 'config'" (click)="trocarAba('config')"><span class="material-icons">settings</span> Configurações</button>
+    </div>
+  </div>
+
+  <div class="content full-width" *ngIf="abaAtiva === 'dashboard' && stats">
+    
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <h3>Total de Itens</h3>
+        <p class="value">{{ stats.total_itens }}</p>
+        <span class="material-icons icon-bg">inventory</span>
+      </div>
+
+      <div class="kpi-card" style="border-left-color: #28a745;">
+        <h3>Valuation (Estoque)</h3>
+        <p class="value" style="color:#28a745">{{ stats.valuation | currency:'BRL':'symbol':'1.2-2' }}</p>
+        <span class="material-icons icon-bg">attach_money</span>
+      </div>
+
+      <div class="kpi-card alerta" style="max-height: 150px; overflow-y: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+          <h3>Itens Críticos</h3>
+          <span style="background:#dc3545; color:white; padding:2px 6px; border-radius:10px; font-size:0.8rem;">{{ stats.qtd_criticos }}</span>
+        </div>
+        
+        <div *ngIf="listaCriticos.length === 0" style="color:#888; font-size:0.9rem;">Nenhum item crítico.</div>
+        
+        <ul style="list-style:none; padding:0; margin:0; font-size:0.85rem;">
+          <li *ngFor="let item of listaCriticos" style="border-bottom:1px solid #eee; padding:4px 0; display:flex; justify-content:space-between;">
+            <span>{{ item.nome }}</span>
+            <strong style="color:#dc3545">{{ item.atual }}</strong>
+          </li>
+        </ul>
+      </div>
+
+      <div class="kpi-card">
+        <h3>Usuários Ativos</h3>
+        <p class="value">{{ stats.total_users }}</p>
+        <span class="material-icons icon-bg">person</span>
+      </div>
+    </div>
+
+    <div class="charts-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+      
+      <div class="chart-card">
+        <h3>Tendência (Últimos 7 Dias)</h3>
+        <canvas baseChart [data]="lineChartData" [type]="lineChartType" [options]="lineChartOptions"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>Top 5 Mais Movimentados</h3>
+        <canvas baseChart [data]="barChartData" [type]="barChartType" [options]="barChartOptions"></canvas>
+      </div>
+
+      <div class="chart-card">
+        <h3>Investimento por Categoria</h3>
+        <canvas baseChart [data]="pieChartData" [type]="pieChartType" [options]="pieChartOptions"></canvas>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="content" *ngIf="abaAtiva === 'itens'">
+    <div class="card cadastro">
+      <h3>Novo Item</h3>
+      <input [(ngModel)]="novoItem.nome" placeholder="Nome do Item">
+      <div class="form-row">
+        <select [(ngModel)]="novoItem.categoria"><option *ngFor="let cat of categoriasDisponiveis" [value]="cat">{{cat}}</option></select>
+        <input [(ngModel)]="novoItem.localizacao" placeholder="Local (Ex: A-10)">
+      </div>
+      <div class="form-row">
+        <input [(ngModel)]="novoItem.marca" placeholder="Marca">
+        <input [(ngModel)]="novoItem.modelo" placeholder="Modelo">
+      </div>
+      <div class="form-row">
+        <input [(ngModel)]="novoItem.serial_number" placeholder="S/N">
+        <input [(ngModel)]="novoItem.part_number" placeholder="P/N">
+        <input [(ngModel)]="novoItem.fabricante" placeholder="Fabricante">
+      </div>
+      <div class="form-row">
+         <div style="flex:1"><label>Estoque:</label><input type="number" [(ngModel)]="novoItem.estoque_inicial"></div>
+         <div style="flex:1"><label>Mínimo:</label><input type="number" [(ngModel)]="novoItem.estoque_minimo"></div>
+         <div style="flex:1"><label>Custo Unit. (R$):</label><input type="number" [(ngModel)]="novoItem.custo_unitario"></div>
+      </div>
+      
+      <label class="label-title">Foto:</label>
+      <input type="file" #fileInput id="fileInputCadastro" (change)="onFileSelected($event)" accept="image/*" style="display:none">
+      <label for="fileInputCadastro" class="btn-upload-custom" [class.has-file]="arquivoFoto">
+        <span class="material-icons">add_a_photo</span><span *ngIf="!arquivoFoto">Escolher...</span><span *ngIf="arquivoFoto">{{ arquivoFoto.name }}</span>
+      </label>
+
+      <button class="btn-primary" (click)="cadastrarItem()" style="width:100%; margin-top:10px;">Cadastrar</button>
+      <div *ngIf="ultimoQrCode" class="qr-preview"><img [src]="ultimoQrCode"><p>{{ ultimoQrNome }}</p></div>
+    </div>
+
+    <div class="card lista">
+      <div class="toolbar">
+        <div class="search-box-minimal"><span class="material-icons">search</span><input [(ngModel)]="termoBusca" placeholder="Pesquisar itens..." class="search-input"></div>
+        <div class="filter-container">
+          <button class="btn-filter-icon" (click)="toggleFiltro()" [class.active]="filtroCategoria !== 'Todas'"><span class="material-icons">filter_list</span><span class="notification-dot" *ngIf="filtroCategoria !== 'Todas'"></span></button>
+          <div class="filter-dropdown" *ngIf="filtroAberto">
+            <div class="dropdown-header">Filtrar por:</div>
+            <ul>
+              <li (click)="selecionarCategoria('Todas')" [class.selected]="filtroCategoria === 'Todas'">Todas <span class="material-icons check" *ngIf="filtroCategoria === 'Todas'">check</span></li>
+              <li *ngFor="let cat of categoriasDisponiveis" (click)="selecionarCategoria(cat)" [class.selected]="filtroCategoria === cat">{{ cat }} <span class="material-icons check" *ngIf="filtroCategoria === cat">check</span></li>
+            </ul>
+          </div>
+          <div class="overlay-click" *ngIf="filtroAberto" (click)="fecharFiltro()"></div>
+        </div>
+      </div>
+
+      <div *ngIf="itemEmEdicao" class="edit-box">
+        <h4>Editando {{ itemEmEdicao.nome }}</h4>
+        <div class="edit-grid">
+          <div class="edit-form">
+             <input [(ngModel)]="itemEmEdicao.nome" placeholder="Nome">
+             <div class="form-row"><input [(ngModel)]="itemEmEdicao.marca" placeholder="Marca"><input [(ngModel)]="itemEmEdicao.modelo" placeholder="Modelo"></div>
+             <div class="form-row"><input [(ngModel)]="itemEmEdicao.serial_number" placeholder="S/N"><input [(ngModel)]="itemEmEdicao.part_number" placeholder="P/N"></div>
+             <div class="form-row">
+               <div><label>Estoque</label><input type="number" [(ngModel)]="itemEmEdicao.estoque_atual"></div>
+               <div><label>Mínimo</label><input type="number" [(ngModel)]="itemEmEdicao.estoque_minimo"></div>
+               <div><label>Custo (R$)</label><input type="number" [(ngModel)]="itemEmEdicao.custo_unitario"></div>
+             </div>
+          </div>
+          <div class="edit-image-manager">
+            <label class="label-title">Imagem:</label>
+            <div class="image-preview-area">
+              <img *ngIf="itemEmEdicao.imagem_url && !removerFotoEdicao && !previewFotoEdicao" [src]="itemEmEdicao.imagem_url" class="preview-img">
+              <img *ngIf="previewFotoEdicao" [src]="previewFotoEdicao" class="preview-img new">
+              <div *ngIf="(!itemEmEdicao.imagem_url || removerFotoEdicao) && !previewFotoEdicao" class="preview-placeholder"><span class="material-icons">image_not_supported</span></div>
+            </div>
+            <div class="image-actions">
+              <input type="file" #fileInputEdit id="fileInputEdit" (change)="onFileSelectedEdicao($event)" accept="image/*" style="display:none;">
+              <label for="fileInputEdit" class="btn-sm btn-primary"><span class="material-icons">add_a_photo</span></label>
+              <button *ngIf="itemEmEdicao.imagem_url || previewFotoEdicao" class="btn-sm btn-danger" (click)="marcarParaRemoverFoto()" [disabled]="removerFotoEdicao"><span class="material-icons">no_photography</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="actions main-actions"><button class="btn-primary" (click)="salvarEdicao()">Salvar</button><button class="btn-danger" (click)="cancelarEdicao()">Cancelar</button></div>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead><tr><th>Item</th><th>Dados Técnicos</th><th>Estoque / Valor</th><th>Ações</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let item of itensFiltrados">
+              <td>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <img *ngIf="item.imagem_url" [src]="item.imagem_url" class="thumb">
+                  <div *ngIf="!item.imagem_url" class="thumb-placeholder"><span class="material-icons">image</span></div>
+                  <div><strong>{{ item.nome }}</strong><br><small>{{ item.codigo_qr }}</small></div>
+                </div>
+              </td>
+              <td><small *ngIf="item.marca"><b>Marca:</b> {{ item.marca }}</small><br><small *ngIf="item.serial_number"><b>S/N:</b> {{ item.serial_number }}</small></td>
+              <td>
+                <strong>{{ item.estoque_atual }}</strong> <span *ngIf="item.estoque_atual < item.estoque_minimo" class="badge-alerta">⚠️</span><br>
+                <small style="color:#28a745">{{ (item.estoque_atual * item.custo_unitario) | currency:'BRL':'symbol':'1.2-2' }}</small>
+              </td>
+              <td><div class="action-buttons"><button class="btn-icon edit" (click)="iniciarEdicao(item)"><span class="material-icons">edit</span></button><button class="btn-icon delete" (click)="deletarItem(item.id)"><span class="material-icons">delete</span></button></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" *ngIf="abaAtiva === 'usuarios'">
+    <div class="card cadastro">
+        <h3>Novo Usuário</h3>
+        <input [(ngModel)]="novoUsuario.nome" placeholder="Nome">
+        <input [(ngModel)]="novoUsuario.matricula" placeholder="Matrícula">
+        <div class="password-group"><input [type]="mostrarSenhaCadastro ? 'text' : 'password'" [(ngModel)]="novoUsuario.senha" placeholder="Senha"><span class="material-icons toggle-eye" (click)="mostrarSenhaCadastro = !mostrarSenhaCadastro">{{ mostrarSenhaCadastro ? 'visibility' : 'visibility_off' }}</span></div>
+        <label>Empresa:</label><select [(ngModel)]="empresaSelecionada"><option value="Kinross">Kinross</option><option value="Terceiro">Terceiro</option></select>
+        <input *ngIf="empresaSelecionada === 'Terceiro'" [(ngModel)]="nomeEmpresaTerceira" placeholder="Nome Empresa" style="margin-top:5px;">
+        <label>Tipo:</label><select [(ngModel)]="novoUsuario.tipo"><option value="comum">Comum</option><option value="admin">Admin</option></select>
+        <button class="btn-primary" (click)="cadastrarUsuario()" style="width:100%; margin-top:10px;">Salvar</button>
+    </div>
+    <div class="card lista">
+        <h3>Equipe</h3>
+        <div *ngIf="usuarioEmEdicao" class="edit-box">
+            <h4>Editando {{ usuarioEmEdicao.nome }}</h4><input [(ngModel)]="usuarioEmEdicao.nome">
+            <label>Empresa:</label><select [(ngModel)]="empresaEdicaoSelecionada"><option value="Kinross">Kinross</option><option value="Terceiro">Terceiro</option></select>
+            <input *ngIf="empresaEdicaoSelecionada === 'Terceiro'" [(ngModel)]="nomeEmpresaEdicaoTerceira" placeholder="Empresa">
+            <div class="actions"><button class="btn-primary" (click)="salvarEdicaoUsuario()">Salvar</button><button class="btn-danger" (click)="cancelarEdicaoUsuario()">Cancelar</button></div>
+        </div>
+        <table><thead><tr><th>Nome</th><th>Empresa</th><th>Tipo</th><th>Ações</th></tr></thead><tbody><tr *ngFor="let u of usuarios"><td>{{ u.nome }}<br><small>{{ u.matricula }}</small></td><td>{{ u.empresa }}</td><td><span [class.admin-tag]="u.tipo === 'admin'">{{ u.tipo | uppercase }}</span></td><td><div class="action-buttons"><button class="btn-icon edit" (click)="iniciarEdicaoUsuario(u)"><span class="material-icons">edit</span></button><button class="btn-icon delete" (click)="deletarUsuario(u.id)"><span class="material-icons">delete</span></button></div></td></tr></tbody></table>
+    </div>
+  </div>
+
+  <div class="content" *ngIf="abaAtiva === 'config'">
+    <div class="card cadastro"><h3>Categorias</h3><div class="form-row"><input [(ngModel)]="novaCategoria" placeholder="Nova Categoria" (keyup.enter)="salvarNovaCategoria()"></div><button class="btn-primary" (click)="salvarNovaCategoria()">Adicionar</button></div>
+    <div class="card lista"><h3>Lista</h3><div *ngIf="categoriaEmEdicao" class="edit-box"><h4>Renomear</h4><input [(ngModel)]="categoriaEmEdicao.nome"><div class="actions"><button class="btn-primary" (click)="salvarEdicaoCategoria()">Salvar</button><button class="btn-danger" (click)="cancelarEdicaoCategoria()">Cancelar</button></div></div><div class="table-responsive"><table><thead><tr><th>Nome</th><th style="width:100px;">Ações</th></tr></thead><tbody><tr *ngFor="let c of categoriasDb"><td><span class="badge-cat">{{c.nome}}</span></td><td><div class="action-buttons"><button class="btn-icon edit" (click)="iniciarEdicaoCategoria(c)"><span class="material-icons">edit</span></button><button class="btn-icon delete" (click)="deletarCategoria(c.id)"><span class="material-icons">delete</span></button></div></td></tr></tbody></table></div></div>
+  </div>
+
+  <div class="content full-width" *ngIf="abaAtiva === 'etiquetas'">
+     <div class="card"><div class="header-etiquetas"><h3>Etiquetas</h3></div><div class="etiquetas-grid"><div class="etiqueta-card" *ngFor="let item of itensFiltrados"><img [src]="gerarUrlQr(item.codigo_qr)"><h4>{{ item.nome }}</h4><button class="btn-primary btn-print" (click)="imprimirEtiqueta(item)"><span class="material-icons">print</span></button></div></div></div>
+  </div>
+  
+  <div class="content full-width" *ngIf="abaAtiva === 'historico'">
+      <div class="card"><h3>Histórico</h3><div class="table-responsive"><table><thead><tr><th>Data</th><th>Quem</th><th>Item</th><th>Mov</th><th>Qtd</th></tr></thead><tbody><tr *ngFor="let h of historico"><td>{{h.data_hora|date:'short'}}</td><td>{{h.usuario}}</td><td>{{h.item}}</td><td [class.entrada]="h.tipo==='entrada'" [class.saida]="h.tipo==='saida'">{{h.tipo|uppercase}}</td><td>{{h.quantidade}}</td></tr></tbody></table></div></div>
+  </div>
+</div>

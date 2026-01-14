@@ -1,0 +1,22 @@
+<nav class="navbar">
+  <div class="brand">
+    <a routerLink="/login"> <img [src]="logoUrl" alt="Kinross Logo">
+    </a>
+    <span class="divider">|</span>
+    <span class="system-name">Inventory Control</span>
+  </div>
+
+  <div class="menu">
+    </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer>
+  <p>&copy; 2025 Kinross Gold Corporation - Internal System</p>
+</footer>
+
+<app-toast></app-toast>
+<app-confirm-modal></app-confirm-modal>

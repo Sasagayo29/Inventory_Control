@@ -1,0 +1,63 @@
+<div class="mobile-container">
+  <div class="user-header">
+    <div><span class="greeting">Olá,</span><h3>{{ nomeUsuario }}</h3></div>
+    <button class="btn-logout" (click)="logout()"><span class="material-icons">logout</span></button>
+  </div>
+
+  <div *ngIf="modo === 'scanner'" class="scanner-view fade-in">
+    <h2>Leitor de QR Code</h2>
+    <div class="scanner-box">
+      <zxing-scanner *ngIf="scannerHabilitado" [enable]="true" (scanSuccess)="onCodeResult($event)"></zxing-scanner>
+      <div class="scanner-overlay" *ngIf="scannerHabilitado"></div>
+      <p *ngIf="!scannerHabilitado">Iniciando câmera...</p>
+    </div>
+    <div class="divider"><span>OU</span></div>
+    <button class="btn-search-large" (click)="entrarModoBusca()">
+      <span class="material-icons">search</span> Buscar Manualmente
+    </button>
+  </div>
+
+  <div *ngIf="modo === 'busca'" class="search-view fade-in">
+    <div class="search-header">
+      <button class="btn-back" (click)="ativarScanner()"><span class="material-icons">arrow_back</span></button>
+      <input [(ngModel)]="termoBusca" (input)="filtrarItens()" placeholder="Digite nome, código..." autofocus>
+    </div>
+    <div class="item-list">
+      <div class="item-card-mini" *ngFor="let item of itensFiltrados" (click)="selecionarItem(item)">
+        <img *ngIf="item.imagem_url" [src]="item.imagem_url">
+        <span *ngIf="!item.imagem_url" class="material-icons placeholder">image</span>
+        <div class="info"><h4>{{ item.nome }}</h4><small>{{ item.localizacao }} • {{ item.codigo_qr }}</small></div>
+        <div class="stock">{{ item.estoque_atual }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="modo === 'detalhes' && itemSelecionado" class="details-view fade-in">
+    <div class="product-header">
+      <img *ngIf="itemSelecionado.imagem_url" [src]="itemSelecionado.imagem_url" class="hero-image">
+      <div class="no-image" *ngIf="!itemSelecionado.imagem_url"><span class="material-icons">inventory_2</span></div>
+      <div class="product-info">
+  <h2>{{ itemSelecionado.nome }}</h2>
+  
+  <div class="tech-specs" style="font-size:0.8rem; color:#555; background:#eee; padding:10px; border-radius:6px; margin: 10px 0;">
+    <div *ngIf="itemSelecionado.marca">Marca: <b>{{ itemSelecionado.marca }}</b></div>
+    <div *ngIf="itemSelecionado.modelo">Modelo: <b>{{ itemSelecionado.modelo }}</b></div>
+    <div *ngIf="itemSelecionado.serial_number">S/N: <b>{{ itemSelecionado.serial_number }}</b></div>
+    <div *ngIf="itemSelecionado.part_number">P/N: <b>{{ itemSelecionado.part_number }}</b></div>
+  </div>
+        <div class="tags"><span class="tag loc">{{ itemSelecionado.localizacao || 'N/A' }}</span><span class="tag cat">{{ itemSelecionado.categoria }}</span></div>
+        <p class="code">COD: {{ itemSelecionado.codigo_qr }}</p>
+      </div>
+    </div>
+    <div class="action-card">
+      <div class="stock-status"><span>Estoque:</span><strong>{{ itemSelecionado.estoque_atual }}</strong></div>
+      <div class="form-group"><label>Ação</label><div class="toggle-type">
+          <button [class.active]="tipoMovimento === 'saida'" (click)="tipoMovimento = 'saida'">RETIRAR</button>
+          <button [class.active]="tipoMovimento === 'entrada'" (click)="tipoMovimento = 'entrada'">DEVOLVER</button>
+      </div></div>
+      <div class="form-group"><label>Quantidade</label><div class="qtd-control"><button (click)="quantidade = quantidade > 1 ? quantidade - 1 : 1">-</button><input type="number" [(ngModel)]="quantidade"><button (click)="quantidade = quantidade + 1">+</button></div></div>
+      <div class="form-group"><label>Motivo</label><input [(ngModel)]="motivo" placeholder="Descreva"></div>
+      <div class="actions"><button class="btn-cancel" (click)="ativarScanner()">Cancelar</button><button class="btn-confirm" (click)="confirmar()">Confirmar</button></div>
+    </div>
+  </div>
+</div>

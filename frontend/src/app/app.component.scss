@@ -1,0 +1,66 @@
+.navbar {
+  background-color: white;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  border-bottom: 3px solid var(--primary-color);
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+
+    img {
+      height: 40px; /* Ajuste altura da logo */
+      width: auto;
+    }
+
+    .divider { color: #ccc; font-size: 1.5rem; font-weight: 300; }
+    
+    .system-name {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: var(--secondary-color);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+  }
+
+  .nav-item {
+    text-decoration: none;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+
+    &:hover { color: var(--primary-color); }
+    .material-icons { font-size: 1.2rem; }
+  }
+}
+
+.main-content {
+  margin-top: 70px; /* Compensa a altura da navbar fixa */
+  min-height: calc(100vh - 120px); /* Altura total menos navbar e footer */
+  padding: 30px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  color: #999;
+  font-size: 0.8rem;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
